@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>oneworship. | Tes Jawatan Pelayanan</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#0f1221;
+    --card:#151936;
+    --muted:#8c93be;
+    --text:#eef1ff;
+    --accent:#7c4dff;
+    --accent-2:#00e5ff;
+    --good:#22c55e;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --ring: 0 0 0 3px rgba(124,77,255,.25);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(60rem 60rem at 15% -5%, rgba(124,77,255,.20), transparent 60%),
+      radial-gradient(50rem 50rem at 100% 10%, rgba(0,229,255,.15), transparent 60%),
+      var(--bg);
+    color:var(--text);
+    line-height:1.5;
+  }
+  header, footer{
+    width:100%;
+  }
+  .wrap{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .brand{
+    display:flex; align-items:center; justify-content:center;
+    gap:.35rem; letter-spacing: .5px; margin: 10px 0 18px;
+    user-select:none;
+  }
+  .brand .one{font-weight:400}
+  .brand .worship{font-weight:800}
+  .brand .dot{font-weight:800}
+  .brand .one, .brand .worship{font-size: clamp(22px, 3.4vw, 32px)}
+  .brand .worship{
+    background: linear-gradient(90deg,var(--accent),var(--accent-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .stepper{
+    display:flex; gap:8px; justify-content:center; margin: 6px 0 18px;
+  }
+  .step{
+    height:8px; width:56px; border-radius:999px; background:#2a2f55; opacity:.5;
+  }
+  .step.active{opacity:1; background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:18px; padding:18px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.25);
+    backdrop-filter: blur(6px);
+  }
+  .hidden{display:none !important}
+
+  .grid{
+    display:grid; gap:14px;
+  }
+  .grid.cols-2{grid-template-columns:1fr; }
+  @media(min-width:900px){ .grid.cols-2{grid-template-columns: 1fr 1fr;} }
+
+  label, .help{color:var(--muted); font-size:.95rem}
+  select, button, input[type="text"]{
+    width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.12);
+    background:#0f1330; color:var(--text);
+  }
+  select:focus, input:focus, button:focus{outline:none; box-shadow: var(--ring)}
+  button{
+    border:none; cursor:pointer; font-weight:700; letter-spacing:.3px;
+    background: linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#0a0c1f;
+  }
+  button.ghost{
+    background:transparent; color:var(--text);
+    border:1px solid rgba(255,255,255,.18)
+  }
+  button:disabled{opacity:.5; cursor:not-allowed}
+  .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px}
+  .note{
+    padding:10px 12px; border:1px dashed rgba(255,255,255,.25);
+    border-radius:12px; color:var(--muted); font-size:.95rem
+  }
+
+  /* Questionnaire */
+  .q{
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px; padding:14px; position:relative;
+    background: #0e1230;
+  }
+  .q h4{margin:0 0 8px; font-size:1rem}
+  .scale{
+    display:grid; grid-template-columns: repeat(5, minmax(56px, 1fr)); gap:8px;
+  }
+  .opt{
+    border:1px solid rgba(255,255,255,.14); border-radius:10px; padding:8px;
+    text-align:center; cursor:pointer; user-select:none; background:#0c102a;
+    transition: transform .05s ease;
+  }
+  .opt:hover{transform: translateY(-1px)}
+  .opt input{display:none}
+  .opt span{display:block; font-size:.85rem; color:var(--muted)}
+  .opt strong{display:block; font-size:1rem; margin-top:2px; color:var(--text)}
+  .opt.selected{outline:2px solid transparent; box-shadow: var(--ring); background:linear-gradient(180deg, rgba(124,77,255,.15), rgba(0,229,255,.15))}
+  .legend{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:.9rem; color:var(--muted); margin-bottom:10px
+  }
+  .legend .dot{
+    width:10px; height:10px; border-radius:50%; background:var(--muted); display:inline-block; margin-right:6px
+  }
+
+  /* Results */
+  .scores{display:grid; grid-template-columns:repeat(1,1fr); gap:10px; margin-top:10px}
+  @media(min-width:700px){ .scores{grid-template-columns:repeat(2,1fr)} }
+  .score{
+    padding:12px; border:1px solid rgba(255,255,255,.10); border-radius:14px; background:#0f1433
+  }
+  .meter{
+    height:10px; background:#262b55; border-radius:999px; overflow:hidden; margin-top:8px
+  }
+  .meter > i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+  .big{
+    font-size: clamp(18px, 3vw, 22px); font-weight:800; letter-spacing:.2px;
+  }
+  .muted{color:var(--muted)}
+  .center{text-align:center}
+
+  .keterangan{font-size:.95rem; color:var(--muted)}
+  .hl{font-weight:800}
+
+  footer .foot{
+    font-size:.9rem; color:var(--muted);
+    text-align:center; padding:18px 0 26px
+  }
+  .chip{
+    display:inline-block; padding:6px 10px; border:1px solid rgba(255,255,255,.15);
+    border-radius:999px; font-size:.8rem; color:var(--muted)
+  }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="brand" aria-label="oneworship brand">
+    <span class="one">one</span><span class="worship">worship</span><span class="worship dot">.</span>
+  </div>
+  <div class="stepper" role="img" aria-label="Langkah pengisian">
+    <div class="step active" id="s1"></div>
+    <div class="step" id="s2"></div>
+    <div class="step" id="s3"></div>
+    <div class="step" id="s4"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- STEP 1: IDENTITAS -->
+  <section id="step-1" class="card">
+    <h2 style="margin-top:4px">Identitas Peserta</h2>
+    <p class="help">Pilih nama kamu dulu ya 👇</p>
+    <div class="grid cols-2">
+      <div>
+        <label for="nama">Pilih Nama</label>
+        <select id="nama" required>
+          <option value="">— pilih —</option>
+          <option value="L001 - Kezia Dwitauli Hutagalang">L001 - Kezia Dwitauli Hutagalang</option>
+          <option value="L002 - Matthew Andrew Maruarar Sitinjak">L002 - Matthew Andrew Maruarar Sitinjak</option>
+          <option value="LT001 - Evangelin Nathania">LT001 - Evangelin Nathania</option>
+          <option value="LT002 - Lavenia Vanesa Pramudana">LT002 - Lavenia Vanesa Pramudana</option>
+          <option value="LT003 - Clarence Kyla Felicia">LT003 - Clarence Kyla Felicia</option>
+          <option value="LT004 - Kentdrew Ezra Asael">LT004 - Kentdrew Ezra Asael</option>
+          <option value="LT005 - Reyfan Cahya Sentosa">LT005 - Reyfan Cahya Sentosa</option>
+          <option value="LT006 - Christian Julius Hidajat">LT006 - Christian Julius Hidajat</option>
+        </select>
+      </div>
+      <div>
+        <label for="kelas">Kelas (opsional)</label>
+        <input type="text" id="kelas" placeholder="Contoh: XI IPS-2" />
+      </div>
+    </div>
+    <div class="actions">
+      <button id="to-step-2">LANJUT KE KUESIONER</button>
+    </div>
+  </section>
+
+  <!-- STEP 2: KUESIONER -->
+  <section id="step-2" class="card hidden">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
+      <h2 style="margin:0">Kuesioner Jawatan Pelayanan</h2>
+      <span class="chip" id="progressChip">0/45 terisi</span>
+    </div>
+    <p class="help">Pilih sesuai dirimu: 1 = Tidak Pernah, 2 = Jarang, 3 = Kadang-kadang, 4 = Kebanyakan, 5 = Selalu.</p>
+    <div class="legend">
+      <span><span class="dot"></span>Skala 1–5</span>
+      <span>Jawab semua pernyataan ya! ✨</span>
+<span> ⚠️KUESIONER BERSIFAT INTERNAL DAN RAHASIA - MOHON UNTUK TIDAK MENYEBARLUASKAN HASIL ATAU KUESIONER DEMI HAK CIPTA⚠️ </span>
+    </div>
+    <div id="questions" class="grid"></div>
+    <div class="actions">
+      <button class="ghost" id="back-1">KEMBALI</button>
+      <button id="finish">SELESAI & LIHAT HASIL</button>
+    </div>
+    <p class="note" style="margin-top:10px">Tip: kamu bisa isi di hp/laptop. Jawabanmu tidak otomatis tersimpan, jadi selesaikan sekali jalan ya.</p>
+  </section>
+
+  <!-- STEP 3: HASIL -->
+  <section id="step-3" class="card hidden">
+    <h2 style="margin-top:4px">Hasil Skor</h2>
+    <p class="keterangan">Nama: <span id="res-nama" class="hl"></span> <span id="res-kelas"></span></p>
+
+    <div class="scores" id="scoreList"></div>
+
+    <div class="center" style="margin-top:12px">
+      <p class="big"><span class="muted">TIPE KAMU ADALAH</span><br><span id="tipeUtama" style="font-weight:800"></span></p>
+      <p class="keterangan"><strong>screenshot halaman ini untuk disetor</strong></p>
+    </div>
+
+    <div class="actions center" style="justify-content:center">
+      <button id="to-explain">CONTINUE</button>
+    </div>
+  </section>
+
+  <!-- STEP 4: PENJELASAN DUA TIPE TERTINGGI -->
+  <section id="step-4" class="card hidden">
+    <h2 style="margin-top:4px">Penjelasan Dua Tipe Tertinggi</h2>
+    <p class="keterangan">Nama: <span id="ex-nama" class="hl"></span> <span id="ex-kelas"></span></p>
+
+    <div id="explainBox" class="grid"></div>
+
+    <div style="margin-top:12px">
+      <a href="https://s.id/tesjawatanoneworship" target="_blank" rel="noopener">
+        <button>SETOR HASIL</button>
+      </a>
+      <button class="ghost" id="back-to-result" style="margin-left:8px">KEMBALI</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">&copy; 2025 Leaders Team oneworship. community SMAK 1 BPK PENABUR Bandung</div>
+</footer>
+
+<script>
+/* ---------- Data Pertanyaan (1–45) ---------- */
+const QUESTIONS = [
+`Saya suka bertanggung jawab dan menjaga orang lain.`,
+`Saya senang memberi inspirasi/ilham pada orang lain.`,
+`Saya suka menjual/mempromosikan sesuatu (cerita, pengalaman, dsb).`,
+`Saya senang menolong orang lain.`,
+`Saya senang menyelidiki sesuatu.`,
+`Saya suka membangun sesuatu dari nol/awal.`,
+`Saya memiliki banyak ide kreatif dan inspirasif.`,
+`Ketika saya tertarik sesuatu, saya menceritakan pada setiap orang.`,
+`Saya biasanya dapat menolong orang-orang dengan semua persoalannya.`,
+`Saya senang di dekat meja saya, selama berjam-jam ketika sedang terlibat riset/penyelidikan.`,
+`Saya senang mengatur orang dan proyek-proyek.`,
+`Saya lebih senang mengembangkan proyek baru daripada mengatur yang sudah ada.`,
+`Saya yakin saya mempunyai jawaban bagi persoalanmu.`,
+`Ketika saya melihat orang terluka, saya ingin membuatnya lebih baik.`,
+`Saya senang menyingkapkan fakta-fakta yang tersembunyi.`,
+`Saya mempunyai komitmen/tekad untuk membuat setiap bagian dari organisasi berjalan dengan baik dan lancar.`,
+`Saya senang menemukan cara-cara baru untuk mengemukakan sesuatu.`,
+`Saya senang membuat orang setuju pada cara berpikir saya.`,
+`Saya seorang pendengar yang baik.`,
+`Saya senang mengajar.`,
+`Saya senang bertanggung jawab atas tugas-tugas yang banyak sekaligus.`,
+`Saya sering menemukan diri saya berbeda dengan mereka yang ada di sekeliling saya.`,
+`Bagi saya jawaban ‘tidak’ dari seseorang bukanlah penolakan terhadap pribadi.`,
+`Orang-orang cenderung menceritakan persoalan mereka kepada saya.`,
+`Saya tidak percaya sesuatu hal sampai saya dapat membuktikannya.`,
+`Orang-orang cenderung melihat saya untuk kepemimpinan/punya kemampuan memimpin.`,
+`Saya percaya bahwa segala sesuatu dapat terus ditingkatkan.`,
+`Saya seorang ekstrovert/berkepribadian terbuka.`,
+`Bagi saya hubungan yang dibangun lebih penting daripada hasil/produk.`,
+`Saya sangat teratur.`,
+`Saya dapat melihat hal-hal yang perlu dikerjakan dan mengarahkan orang lain untuk menyelesaikannya secara efektif.`,
+`Saya umumnya mempertanyakan kondisi yang tetap/statis.`,
+`Saya biasanya membuat orang setuju pada cara berpikir saya.`,
+`Saya senang mengkonseling/menasihati seseorang.`,
+`Saya senang menganalisa sesuatu.`,
+`Saya senang mengalami sendiri secara pribadi segala hal yang saya awasi.`,
+`Saya suka musik, drama, dan berbagai bentuk lain dari ekspresi yang kreatif.`,
+`Orang-orang sering mengatakan bahwa saya suka memaksa.`,
+`Saya mengunjungi orang-orang saat mereka terluka.`,
+`Saya senang melihat kebenaran disajikan baris demi baris/terstruktur/sistematis.`,
+`Saya sangat bahagia ketika semua detail tersusun dalam sebuah keseluruhan laporan lengkap.`,
+`Saya sering melihat dan berkata tajam kepada inti sebuah masalah.`,
+`Saya adalah orang yang menarik.`,
+`Saya ada bersama orang-orang ketika mereka sedang dalam masalah.`,
+`Saya senang membaca.`
+];
+
+/* ---------- Pemetaan Soal → Tipe ---------- */
+/* Catatan: memperbaiki typo “73” menjadi 37 agar konsisten berjarak 5. */
+const MAP = {
+  APOSTLE:  [1,6,11,16,21,26,31,36,41],
+  PROPHET:  [2,7,12,17,22,27,32,37,42],
+  EVANGELIST:[3,8,13,18,23,28,33,38,43],
+  PASTOR:   [4,9,14,19,24,29,34,39,44],
+  TEACHER:  [5,10,15,20,25,30,35,40,45]
+};
+const MAX_PER_TYPE = 45; // 9 soal × skor maks 5
+
+/* ---------- Render Kuesioner ---------- */
+const qWrap = document.getElementById('questions');
+function renderQuestions(){
+  const frag = document.createDocumentFragment();
+  QUESTIONS.forEach((text, idx) => {
+    const n = idx+1;
+    const sec = document.createElement('section');
+    sec.className = 'q';
+    const h = document.createElement('h4');
+    h.innerHTML = `${n}. ${text}`;
+    sec.appendChild(h);
+
+    const scale = document.createElement('div');
+    scale.className = 'scale';
+
+    const labels = ['Tidak Pernah','Jarang','Kadang-kadang','Kebanyakan','Selalu'];
+
+    for(let v=1; v<=5; v++){
+      const lab = document.createElement('label');
+      lab.className = 'opt';
+      lab.setAttribute('data-for', `q${n}-${v}`);
+      lab.innerHTML = `<input type="radio" name="q${n}" value="${v}" ${v===1?'required':''}/>
+                       <span>${labels[v-1]}</span>
+                       <strong>${v}</strong>`;
+      lab.addEventListener('click', () => {
+        // tandai selected UI
+        [...scale.children].forEach(c => c.classList.remove('selected'));
+        lab.classList.add('selected');
+        updateProgress();
+      });
+      scale.appendChild(lab);
+    }
+    sec.appendChild(scale);
+    frag.appendChild(sec);
+  });
+  qWrap.appendChild(frag);
+}
+renderQuestions();
+
+/* ---------- Navigasi Langkah ---------- */
+const stepEls = [document.getElementById('step-1'), document.getElementById('step-2'),
+                 document.getElementById('step-3'), document.getElementById('step-4')];
+function go(stepIdx){
+  stepEls.forEach((el,i)=>{ el.classList.toggle('hidden', i!==stepIdx); });
+  // stepper vis
+  document.getElementById('s1').classList.toggle('active', stepIdx>=0);
+  document.getElementById('s2').classList.toggle('active', stepIdx>=1);
+  document.getElementById('s3').classList.toggle('active', stepIdx>=2);
+  document.getElementById('s4').classList.toggle('active', stepIdx>=3);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------- Progress ---------- */
+function updateProgress(){
+  const answered = QUESTIONS.reduce((acc,_,i)=> acc + (getValue(i+1)!==null?1:0), 0);
+  document.getElementById('progressChip').textContent = `${answered}/45 terisi`;
+}
+function getValue(n){
+  const sel = document.querySelector(`input[name="q${n}"]:checked`);
+  return sel ? parseInt(sel.value,10) : null;
+}
+
+/* ---------- Hitung Skor ---------- */
+function calculateScores(){
+  const scores = {APOSTLE:0, PROPHET:0, EVANGELIST:0, PASTOR:0, TEACHER:0};
+  // Validasi semua terisi
+  for(let i=1;i<=45;i++){
+    if(getValue(i)===null){
+      return {error:`Pernyataan nomor ${i} belum diisi. Silakan lengkapi semua pertanyaan.`};
+    }
+  }
+  for(const [tipe, arr] of Object.entries(MAP)){
+    arr.forEach(n=>{
+      scores[tipe] += getValue(n);
+    });
+  }
+  return {scores};
+}
+
+/* ---------- UI Skor ---------- */
+function renderScores(scores){
+  const list = document.getElementById('scoreList');
+  list.innerHTML = '';
+  const make = (name,val)=>{
+    const box = document.createElement('div');
+    box.className='score';
+    box.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center">
+        <strong>${name}</strong>
+        <span>${val}/${MAX_PER_TYPE}</span>
+      </div>
+      <div class="meter" aria-hidden="true"><i style="width:${(val/MAX_PER_TYPE)*100}%"></i></div>`;
+    list.appendChild(box);
+  };
+  make('APOSTLE', scores.APOSTLE);
+  make('PROPHET', scores.PROPHET);
+  make('EVANGELIST', scores.EVANGELIST);
+  make('PASTOR', scores.PASTOR);
+  make('TEACHER', scores.TEACHER);
+}
+
+/* ---------- Deskripsi Tipe & Kombinasi ---------- */
+const DESC = {
+  APOSTLE: [
+    'Mengembangkan pemimpin',
+    'Membangun fondasi gereja',
+    'Melatih dan melepas pemimpin',
+    'Mereproduksi diri dalam pemimpin rohani',
+    'Menyukai perubahan dan inovasi',
+    'Berani mengambil risiko',
+    'Visi besar untuk gereja'
+  ],
+  PROPHET: [
+    'Melihat dan mendengar apa yang orang lain tidak bisa',
+    'Mengungkap isi hati Tuhan',
+    'Mengidentifikasi masalah dan prioritas',
+    'Mengajak bertindak',
+    'Akurasi tinggi dalam pesan',
+    'Membantu mendengarkan Tuhan'
+  ],
+  EVANGELIST: [
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus',
+    'Memberitakan Injil dengan kuat',
+    'Melatih orang lain untuk menginjil'
+  ],
+  PASTOR: [
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan dan peduli terhadap masalah orang lain',
+    'Melindungi dari bahaya',
+    'Melatih pemimpin kelompok kecil'
+  ],
+  TEACHER: [
+    'Mengajarkan prinsip dan doktrin dengan jelas',
+    'Mengeluarkan wahyu',
+    'Memvalidasi kebenaran',
+    'Mengajar dengan otoritas',
+    'Melatih dan melepas guru lain'
+  ]
+};
+
+// Kombinasi ringkas (tanpa dominansi)
+const COMBO = {
+  'APOSTLE+PROPHET': [
+    'Mengembangkan pemimpin dan melihat masalah yang tidak terlihat orang lain',
+    'Membangun fondasi gereja dan mengungkap isi hati Tuhan',
+    'Melatih pemimpin dan mengajak bertindak',
+    'Menyukai inovasi dan memiliki akurasi tinggi dalam pesan'
+  ],
+  'APOSTLE+EVANGELIST': [
+    'Mengembangkan pemimpin dan ingin melihat orang diselamatkan',
+    'Membangun fondasi gereja dan membawa orang kepada Kristus',
+    'Melatih pemimpin dan memberitakan Injil dengan kuat',
+    'Menyukai perubahan dan melatih orang lain untuk menginjil'
+  ],
+  'APOSTLE+PASTOR': [
+    'Mengembangkan pemimpin dan merasa senang ketika orang dibebaskan',
+    'Membangun fondasi gereja dan mendengarkan masalah orang lain',
+    'Melatih pemimpin dan melindungi dari bahaya',
+    'Menyukai inovasi dan melatih pemimpin kelompok kecil'
+  ],
+  'APOSTLE+TEACHER': [
+    'Mengembangkan pemimpin dan mengajarkan prinsip dengan jelas',
+    'Membangun fondasi gereja dan mengeluarkan wahyu',
+    'Melatih pemimpin dan memvalidasi kebenaran',
+    'Menyukai perubahan dan melatih guru lain'
+  ],
+  'PROPHET+EVANGELIST': [
+    'Melihat apa yang tidak terlihat orang lain dan ingin melihat orang diselamatkan',
+    'Mengungkap isi hati Tuhan dan membawa orang kepada Kristus',
+    'Mengajak bertindak dan memberitakan Injil dengan kuat',
+    'Akurasi tinggi dalam pesan dan melatih orang lain untuk menginjil'
+  ],
+  'PROPHET+PASTOR': [
+    'Melihat masalah yang tidak terlihat orang lain dan merasa senang ketika orang dibebaskan',
+    'Mengungkap isi hati Tuhan dan mendengarkan masalah orang lain',
+    'Mengajak bertindak dan melindungi dari bahaya',
+    'Akurasi tinggi dalam pesan dan melatih pemimpin kelompok kecil'
+  ],
+  'PROPHET+TEACHER': [
+    'Melihat apa yang tidak terlihat orang lain dan mengajarkan prinsip dengan jelas',
+    'Mengungkap isi hati Tuhan dan mengeluarkan wahyu',
+    'Mengajak bertindak dan memvalidasi kebenaran',
+    'Akurasi tinggi dalam pesan dan mengajar dengan otoritas'
+  ],
+  'EVANGELIST+PASTOR': [
+    'Ingin melihat orang diselamatkan dan merasa senang ketika orang dibebaskan',
+    'Membawa orang kepada Kristus dan mendengarkan masalah orang lain',
+    'Memberitakan Injil dengan kuat dan melindungi dari bahaya',
+    'Melatih orang lain untuk menginjil dan melatih pemimpin kelompok kecil'
+  ],
+  'EVANGELIST+TEACHER': [
+    'Ingin melihat orang diselamatkan dan mengajarkan prinsip dengan jelas',
+    'Membawa orang kepada Kristus dan mengeluarkan wahyu',
+    'Memberitakan Injil dengan kuat dan memvalidasi kebenaran',
+    'Melatih orang lain untuk menginjil dan mengajar dengan otoritas'
+  ],
+  'PASTOR+TEACHER': [
+    'Merasa senang ketika orang dibebaskan dan mengajarkan prinsip dengan jelas',
+    'Mendengarkan masalah orang lain dan mengeluarkan wahyu',
+    'Melindungi dari bahaya dan memvalidasi kebenaran',
+    'Melatih pemimpin kelompok kecil dan melatih guru lain'
+  ],
+};
+
+// Kombinasi dengan dominansi
+const DOMINANCE = {
+  'APOSTLE>PROPHET': [
+    'Mengembangkan pemimpin',
+    'Membangun fondasi gereja',
+    'Melatih dan melepas pemimpin',
+    'Menyukai perubahan dan inovasi',
+    'Visi besar untuk gereja',
+    'Melihat masalah yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan'
+  ],
+  'PROPHET>APOSTLE': [
+    'Melihat apa yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan',
+    'Mengidentifikasi masalah dan prioritas',
+    'Mengajak bertindak',
+    'Akurasi tinggi dalam pesan',
+    'Mengembangkan pemimpin',
+    'Menyukai perubahan dan inovasi'
+  ],
+  'APOSTLE>EVANGELIST': [
+    'Mengembangkan pemimpin',
+    'Membangun fondasi gereja',
+    'Melatih dan melepas pemimpin',
+    'Menyukai perubahan dan inovasi',
+    'Visi besar untuk gereja',
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus'
+  ],
+  'EVANGELIST>APOSTLE': [
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus',
+    'Memberitakan Injil dengan kuat',
+    'Melatih orang lain untuk menginjil',
+    'Mengembangkan pemimpin',
+    'Menyukai perubahan dan inovasi'
+  ],
+  'APOSTLE>PASTOR': [
+    'Mengembangkan pemimpin',
+    'Membangun fondasi gereja',
+    'Melatih dan melepas pemimpin',
+    'Menyukai perubahan dan inovasi',
+    'Visi besar untuk gereja',
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain'
+  ],
+  'PASTOR>APOSTLE': [
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain',
+    'Melindungi dari bahaya',
+    'Melatih pemimpin kelompok kecil',
+    'Mengembangkan pemimpin',
+    'Menyukai perubahan dan inovasi'
+  ],
+  'APOSTLE>TEACHER': [
+    'Mengembangkan pemimpin',
+    'Membangun fondasi gereja',
+    'Melatih dan melepas pemimpin',
+    'Menyukai perubahan dan inovasi',
+    'Visi besar untuk gereja',
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu'
+  ],
+  'TEACHER>APOSTLE': [
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu',
+    'Memvalidasi kebenaran',
+    'Mengajar dengan otoritas',
+    'Melatih dan melepas guru lain',
+    'Mengembangkan pemimpin',
+    'Menyukai perubahan dan inovasi'
+  ],
+  'PROPHET>EVANGELIST': [
+    'Melihat apa yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan',
+    'Mengidentifikasi masalah dan prioritas',
+    'Mengajak bertindak',
+    'Akurasi tinggi dalam pesan',
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus'
+  ],
+  'EVANGELIST>PROPHET': [
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus',
+    'Memberitakan Injil dengan kuat',
+    'Melatih orang lain untuk menginjil',
+    'Melihat masalah yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan'
+  ],
+  'PROPHET>PASTOR': [
+    'Melihat apa yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan',
+    'Mengidentifikasi masalah dan prioritas',
+    'Mengajak bertindak',
+    'Akurasi tinggi dalam pesan',
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain'
+  ],
+  'PASTOR>PROPHET': [
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain',
+    'Melindungi dari bahaya',
+    'Melatih pemimpin kelompok kecil',
+    'Melihat masalah yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan'
+  ],
+  'PROPHET>TEACHER': [
+    'Melihat apa yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan',
+    'Mengidentifikasi masalah dan prioritas',
+    'Mengajak bertindak',
+    'Akurasi tinggi dalam pesan',
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu'
+  ],
+  'TEACHER>PROPHET': [
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu',
+    'Memvalidasi kebenaran',
+    'Mengajar dengan otoritas',
+    'Melatih dan melepas guru lain',
+    'Melihat masalah yang tidak terlihat orang lain',
+    'Mengungkap isi hati Tuhan'
+  ],
+  'EVANGELIST>PASTOR': [
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus',
+    'Memberitakan Injil dengan kuat',
+    'Melatih orang lain untuk menginjil',
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain'
+  ],
+  'PASTOR>EVANGELIST': [
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain',
+    'Melindungi dari bahaya',
+    'Melatih pemimpin kelompok kecil',
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus'
+  ],
+  'EVANGELIST>TEACHER': [
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus',
+    'Memberitakan Injil dengan kuat',
+    'Melatih orang lain untuk menginjil',
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu'
+  ],
+  'TEACHER>EVANGELIST': [
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu',
+    'Memvalidasi kebenaran',
+    'Mengajar dengan otoritas',
+    'Melatih dan melepas guru lain',
+    'Ingin melihat orang diselamatkan',
+    'Membawa orang kepada Kristus'
+  ],
+  'PASTOR>TEACHER': [
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain',
+    'Melindungi dari bahaya',
+    'Melatih pemimpin kelompok kecil',
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu'
+  ],
+  'TEACHER>PASTOR': [
+    'Mengajarkan prinsip dengan jelas',
+    'Mengeluarkan wahyu',
+    'Memvalidasi kebenaran',
+    'Mengajar dengan otoritas',
+    'Melatih dan melepas guru lain',
+    'Merasa senang ketika orang dibebaskan',
+    'Mendengarkan masalah orang lain'
+  ],
+};
+
+/* ---------- Buat Penjelasan ---------- */
+function makeDescList(title, items){
+  const box = document.createElement('div');
+  box.className = 'score';
+  box.innerHTML = `<h3 style="margin:.2rem 0">${title}</h3>`;
+  const ul = document.createElement('ul');
+  ul.style.margin = '6px 0 0';
+  ul.style.paddingLeft = '18px';
+  items.forEach(t=>{
+    const li = document.createElement('li');
+    li.textContent = t;
+    ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  return box;
+}
+
+/* ---------- Events ---------- */
+document.getElementById('to-step-2').addEventListener('click', ()=>{
+  const nama = document.getElementById('nama').value;
+  if(!nama){ alert('Pilih nama dulu ya.'); return; }
+  go(1);
+});
+
+document.getElementById('back-1').addEventListener('click', ()=> go(0));
+
+document.getElementById('finish').addEventListener('click', ()=>{
+  const res = calculateScores();
+  if(res.error){ alert(res.error); return; }
+
+  const {scores} = res;
+  // tampilkan skor
+  renderScores(scores);
+
+  // urutkan untuk ambil 2 teratas
+  const pairs = Object.entries(scores); // [ [APOSTLE, xx], ... ]
+  pairs.sort((a,b)=> b[1]-a[1]); // desc
+  const [top1, top2] = [pairs[0], pairs[1]];
+  const tipeUtamaEl = document.getElementById('tipeUtama');
+  tipeUtamaEl.textContent = `${top1[0]}`;
+
+  // nama
+  document.getElementById('res-nama').textContent = document.getElementById('nama').value;
+  const k = document.getElementById('kelas').value?.trim();
+  document.getElementById('res-kelas').textContent = k ? `• Kelas: ${k}` : '';
+
+  // simpan ke state sederhana (window)
+  window._result = {scores, top1, top2, nama: document.getElementById('nama').value, kelas: k};
+
+  go(2);
+});
+
+document.getElementById('to-explain').addEventListener('click', ()=>{
+  const state = window._result;
+  if(!state){ return; }
+  const {top1, top2, nama, kelas} = state;
+  document.getElementById('ex-nama').textContent = nama;
+  document.getElementById('ex-kelas').textContent = kelas ? `• Kelas: ${kelas}` : '';
+
+  const box = document.getElementById('explainBox');
+  box.innerHTML = '';
+
+  // Deskripsi masing-masing tipe
+  box.appendChild(makeDescList(`${top1[0]} — Ciri-ciri`, DESC[top1[0]] || []));
+  box.appendChild(makeDescList(`${top2[0]} — Ciri-ciri`, DESC[top2[0]] || []));
+
+  // Kombinasi (tanpa dominansi)
+  const key = `${top1[0]}+${top2[0]}`;
+  const keyRev = `${top2[0]}+${top1[0]}`;
+  const combo = COMBO[key] || COMBO[keyRev] || [];
+  if(combo.length){
+    box.appendChild(makeDescList(`Kombinasi ${top1[0]} + ${top2[0]}`, combo));
+  }
+
+  // Kombinasi dengan dominansi (top1 lebih dominan)
+  const domKey = `${top1[0]}>${top2[0]}`;
+  if(DOMINANCE[domKey]){
+    box.appendChild(makeDescList(`${top1[0]}–${top2[0]} ( ${top1[0]} lebih dominan )`, DOMINANCE[domKey]));
+  }
+
+  go(3);
+});
+
+document.getElementById('back-to-result').addEventListener('click', ()=> go(2));
+
+/* Inisialisasi step awal */
+go(0);
+</script>
+</body>
+</html>
